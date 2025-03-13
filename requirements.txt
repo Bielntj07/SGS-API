@@ -1,0 +1,7 @@
+Flask==2.0.1
+Flask-PyMongo==2.3.0
+Flask-Swagger-UI==3.36.0
+MongoEngine==0.24.1
+python-dotenv==0.19.2
+pymongo==3.12.1   # Versão específica do pymongo, que é compatível com MongoEngine
+werkzeug==2.0.2
