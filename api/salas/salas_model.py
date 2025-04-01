@@ -23,7 +23,7 @@ class Sala(db.Model):
         self.hora_termino = None
 
     def to_dict(self):
-        disponibilidade = "Disponível" if self.status_sala else "Indisponível"
+        disponibilidade = "Disponivel" if self.status_sala else "Indisponivel"
         return {
             'id': self.id,
             'nome': self.nome,
@@ -97,6 +97,23 @@ def reservar_sala(sala_id, dados):
     else:
         return {'message': 'sala indisponível'}, 400
 
+
+def cancelar_reserva(sala_id):
+    sala = Sala.query.get(sala_id)
+    if not sala:
+        raise SalaNaoEncontrada(f'sala com ID {sala_id} não encontrada.')
+
+    if not sala.status_sala:
+        sala.status_sala = True
+        sala.turma = None
+        sala.data = None
+        sala.hora_inicio = None
+        sala.hora_termino = None
+        
+        db.session.commit()
+        return {'message': 'Reserva cancelada com sucesso!'}, 200
+    else:
+        return {'message': 'Sala não está reservada.'}, 400
 
 def excluir_sala(sala_id: int) -> None:
     """Exclui uma sala do sistema."""
