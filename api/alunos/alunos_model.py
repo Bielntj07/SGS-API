@@ -7,8 +7,8 @@ class Aluno(db.Model):
   id = db.Column(db.Integer, primary_key=True)
   nome = db.Column(db.String(100), nullable=False)
   email = db.Column(db.String(100),nullable=False)
-  turmas = db.relationship("Turma", back_populates="alunos")
-  turmas_id = db.Column(db.Integer, db.ForeignKey("turmas.id"), nullable=False)
+  turma = db.relationship("Turma", back_populates="alunos")
+  turma_id = db.Column(db.Integer, db.ForeignKey("turmas.id"), nullable=False)
 
   def __init__(self, nome, email, turma_id):
     self.nome = nome

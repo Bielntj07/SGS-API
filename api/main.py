@@ -1,4 +1,4 @@
-# from swagger.swagger_config import configure_swagger
+from swagger.swagger_config import configure_swagger
 from config import app,db
 from admin.admin_routes import administradores_blueprint
 from salas.salas_routes import salas_blueprint
@@ -12,7 +12,7 @@ app.register_blueprint(professores_blueprint, url_prefix='/api')
 app.register_blueprint(administradores_blueprint, url_prefix='/api')
 app.register_blueprint(salas_blueprint, url_prefix='/api')
 
-# configure_swagger(app)
+configure_swagger(app)
 
 with app.app_context():
     db.create_all()
