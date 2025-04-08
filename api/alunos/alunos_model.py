@@ -55,7 +55,6 @@ def adicionar_aluno(novos_dados):
         return {"message": "Aluno adicionado com sucesso!"}, 201
 
 
-
 def atualizar_aluno(id_aluno, novos_dados):
   aluno = Aluno.query.get(id_aluno)
   if not aluno:

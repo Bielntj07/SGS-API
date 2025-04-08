@@ -1,5 +1,5 @@
 from flask_restx import Namespace, Resource, fields
-from salas.salas_model import listar_salas, adicionar_sala, sala_por_id, atualizar_sala, reservar_sala, excluir_sala
+from salas.salas_model import listar_salas, adicionar_sala, sala_por_id, atualizar_sala, reservar_sala, excluir_sala, cancelar_reserva
 
 salas_ns = Namespace("salas", description="Operações relacionadas às salas")
 
@@ -70,3 +70,13 @@ class SalaReservaResource(Resource):
         """Reserva uma sala"""
         data = salas_ns.payload
         return reservar_sala(sala_id, data)
+
+@salas_ns.route("/<int:sala_id>/cancelar")
+class SalaCancelarResource(Resource):
+    @salas_ns.response(200, "Reserva cancelada com sucesso!")
+    @salas_ns.response(400, "Sala não está reservada.")
+    @salas_ns.response(404, "Sala não encontrada.")
+    def delete(self, sala_id):
+        """Cancela a reserva de uma sala"""
+        return cancelar_reserva(sala_id)
+

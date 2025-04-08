@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify, render_template, redirect, url_for
-from .salas_model import SalaNaoEncontrada, listar_salas, sala_por_id, adicionar_sala, atualizar_sala, reservar_sala, excluir_sala, excluir_todas_salas
+from .salas_model import SalaNaoEncontrada, listar_salas, sala_por_id, adicionar_sala, atualizar_sala, reservar_sala, excluir_sala, excluir_todas_salas, cancelar_reserva
 from config import db
 
 salas_blueprint = Blueprint('salas', __name__)
@@ -47,6 +47,18 @@ def reserva_sala(id_sala):
             return jsonify({'message': 'sala não encontrada'}), 404
         reservar_sala(id_sala, dados)
         return jsonify(dados), 200  
+
+    except SalaNaoEncontrada:
+        return jsonify({'message': 'sala não encontrada'}), 404
+
+@salas_blueprint.route('/salas/cancelar/<int:id_sala>', methods=['DELETE'])
+def cancela_reserva(id_sala):
+    try:
+        sala = sala_por_id(id_sala)
+        if not sala:
+            return jsonify({'message': 'sala não encontrada'}), 404
+        cancelar_reserva(id_sala)
+        return 200  
 
     except SalaNaoEncontrada:
         return jsonify({'message': 'sala não encontrada'}), 404

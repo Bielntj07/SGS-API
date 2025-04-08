@@ -1,5 +1,6 @@
 from config import db
 from datetime import datetime
+from sqlalchemy import and_
 
 class Sala(db.Model):
     __tablename__ = "salas"
@@ -23,16 +24,16 @@ class Sala(db.Model):
         self.hora_termino = None
 
     def to_dict(self):
-        disponibilidade = "Disponível" if self.status_sala else "Indisponível"
+        disponibilidade = "Disponivel" if self.status_sala else "Indisponivel"
         return {
             'id': self.id,
             'nome': self.nome,
             'capacidade': self.capacidade,
             'status_sala': disponibilidade,
             'turma': self.turma,
-            'data': self.data,
-            'hora_inicio': self.hora_inicio,
-            'hora_termino': self.hora_termino
+            'data': self.data.strftime("%Y-%m-%d") if self.data else None,
+            'hora_inicio': self.hora_inicio.strftime("%H:%M") if self.hora_inicio else None,
+            'hora_termino': self.hora_termino.strftime("%H:%M") if self.hora_termino else None
         }
 
 
@@ -81,22 +82,54 @@ def atualizar_sala(sala_id: int, novos_dados: dict) -> None:
 def reservar_sala(sala_id, dados):
     sala = Sala.query.get(sala_id)
     if not sala:
+        raise SalaNaoEncontrada(f'Sala com ID {sala_id} não encontrada.')
+
+    # Converte os dados de horário
+    data_reserva = datetime.strptime(dados['data'], "%Y-%m-%d").date()
+    hora_inicio_reserva = datetime.strptime(dados['hora_inicio'], "%H:%M").time()
+    hora_termino_reserva = datetime.strptime(dados['hora_termino'], "%H:%M").time()
+
+    # Verifica se há conflito de horário com outras reservas
+    conflito = Sala.query.filter(
+        Sala.id == sala_id,
+        Sala.status_sala == False,  # Apenas se estiver ocupada
+        Sala.data == data_reserva,
+        and_(
+            Sala.hora_inicio < hora_termino_reserva,
+            Sala.hora_termino > hora_inicio_reserva
+        )
+    ).first()
+
+    if conflito:
+        return {'message': 'Sala já está reservada nesse horário'}, 400
+
+    # Reserva a sala
+    sala.status_sala = False
+    sala.turma = dados['turma']
+    sala.data = data_reserva
+    sala.hora_inicio = hora_inicio_reserva
+    sala.hora_termino = hora_termino_reserva
+
+    db.session.commit()
+    return {'message': 'Sala reservada com sucesso!'}, 200
+
+
+def cancelar_reserva(sala_id):
+    sala = Sala.query.get(sala_id)
+    if not sala:
         raise SalaNaoEncontrada(f'sala com ID {sala_id} não encontrada.')
 
-    if sala.status_sala:
-        sala.status_sala = False
-        sala.turma = dados['turma']
-        sala.data = datetime.strptime(dados['data'], "%Y-%m-%d").date()
-        
-        
-        sala.hora_inicio = datetime.strptime(dados['hora_inicio'], "%H:%M").time()
-        sala.hora_termino = datetime.strptime(dados['hora_termino'], "%H:%M").time()
+    if not sala.status_sala:
+        sala.status_sala = True
+        sala.turma = None
+        sala.data = None
+        sala.hora_inicio = None
+        sala.hora_termino = None
         
         db.session.commit()
-        return {'message': 'sala reservada com sucesso!'}, 200
+        return {'message': 'Reserva cancelada com sucesso!'}, 200
     else:
-        return {'message': 'sala indisponível'}, 400
-
+        return {'message': 'Sala não está reservada.'}, 400
 
 def excluir_sala(sala_id: int) -> None:
     """Exclui uma sala do sistema."""
