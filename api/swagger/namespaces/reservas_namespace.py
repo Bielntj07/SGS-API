@@ -1,5 +1,5 @@
 from flask_restx import Namespace, Resource, fields
-from salas.reservas_service import listar_reservas_sala, cancelar_reserva
+from salas.reservas_service import listar_reservas_sala, cancelar_reserva, buscar_reserva_por_id
 
 reservas_ns = Namespace("reservas", description="Reservas de Salas")
 
@@ -19,7 +19,19 @@ class ReservasSalaResource(Resource):
         """Lista todas as reservas de uma sala"""
         return listar_reservas_sala(sala_id)
 
-@reservas_ns.route("/reservas/<int:reserva_id>/cancelar")
+@reservas_ns.route("/<int:reserva_id>")
+class ReservaIdResource(Resource):
+    @reservas_ns.marshal_with(reserva_output_model)
+    @reservas_ns.response(404, "Reserva não encontrada")
+    def get(self, reserva_id):
+        """Consulta uma reserva específica pelo ID"""
+        reserva = buscar_reserva_por_id(reserva_id)
+        if reserva:
+            return reserva, 200
+        else:
+            return {"message": "Reserva não encontrada"}, 404
+
+@reservas_ns.route("/<int:reserva_id>/cancelar")
 class CancelarReservaResource(Resource):
     @reservas_ns.response(200, "Reserva cancelada com sucesso")
     @reservas_ns.response(404, "Reserva não encontrada")

@@ -45,3 +45,7 @@ def cancelar_reserva(reserva_id):
     db.session.delete(reserva)
     db.session.commit()
     return True
+
+def buscar_reserva_por_id(reserva_id):
+    reserva = Reserva.query.get(reserva_id)
+    return reserva.to_dict() if reserva else None

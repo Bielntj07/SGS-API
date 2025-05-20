@@ -1,5 +1,5 @@
 from flask import Blueprint, request, jsonify
-from .reservas_service import reservar_sala, listar_reservas_sala, ReservaConflito, cancelar_reserva
+from .reservas_service import reservar_sala, listar_reservas_sala, ReservaConflito, cancelar_reserva, buscar_reserva_por_id
 
 reservas_blueprint = Blueprint('reservas', __name__)
 
@@ -14,8 +14,16 @@ def reservar(id_sala):
     try:
         reserva = reservar_sala(id_sala, dados)
         return jsonify(reserva.to_dict()), 201
-    except ReservaConflito as e:
-        return jsonify({'message': str(e)}), 400
+    except ReservaConflito:
+        return jsonify({'message': 'Já existe uma reserva para a sala, data e horário definidos.'}), 400
+
+@reservas_blueprint.route('/reservas/<int:reserva_id>', methods=['GET'])
+def get_reserva(reserva_id):
+    reserva = buscar_reserva_por_id(reserva_id)
+    if reserva:
+        return jsonify(reserva), 200
+    else:
+        return jsonify({'message': 'Reserva não encontrada'}), 404
 
 @reservas_blueprint.route('/reservas/<int:reserva_id>/cancelar', methods=['DELETE'])
 def cancelar(reserva_id):

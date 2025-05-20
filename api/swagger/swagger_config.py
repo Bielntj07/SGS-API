@@ -4,6 +4,7 @@ from swagger.namespaces.professor_namespace import professores_ns
 from swagger.namespaces.turmas_namespace import turmas_ns
 from swagger.namespaces.salas_namespace import salas_ns
 from swagger.namespaces.admin_namespace import admin_ns
+from swagger.namespaces.reservas_namespace import reservas_ns
 
 def configure_swagger(app):
     api.init_app(app)
@@ -12,4 +13,5 @@ def configure_swagger(app):
     api.add_namespace(turmas_ns, path="/turmas")
     api.add_namespace(salas_ns, path="/salas")
     api.add_namespace(admin_ns, path="/administradores")
+    api.add_namespace(reservas_ns, path="/reservas")
     api.mask_swagger = False
