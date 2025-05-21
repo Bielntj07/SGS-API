@@ -25,6 +25,16 @@ def get_reserva(reserva_id):
     else:
         return jsonify({'message': 'Reserva não encontrada'}), 404
 
+@reservas_blueprint.route('/reservas/<int:reserva_id>', methods=['PUT'])
+def editar_reserva(reserva_id):
+    from .reservas_service import editar_reserva
+    dados = request.json
+    reserva = editar_reserva(reserva_id, dados)
+    if reserva:
+        return jsonify(reserva.to_dict()), 200
+    else:
+        return jsonify({'message': 'Reserva não encontrada'}), 404
+
 @reservas_blueprint.route('/reservas/<int:reserva_id>/cancelar', methods=['DELETE'])
 def cancelar(reserva_id):
     resultado = cancelar_reserva(reserva_id)

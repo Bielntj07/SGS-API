@@ -45,11 +45,15 @@ def listar_salas() -> list:
 
 
 def adicionar_sala(sala_dados):
+    laboratorio = sala_dados.get('laboratorio')
+    true_values = ['true', '1', 't', 'yes', 'sim', 'True', 'TRUE', True, 1]
+    laboratorio = laboratorio in true_values
+
     nova_sala = Sala(
         nome=sala_dados['nome'],
         capacidade=sala_dados['capacidade'],
         andar=sala_dados['andar'],
-        laboratorio=sala_dados['laboratorio']
+        laboratorio=laboratorio
     )
 
     db.session.add(nova_sala)
@@ -64,7 +68,11 @@ def atualizar_sala(sala_id: int, novos_dados: dict) -> None:
     if not sala:
         raise SalaNaoEncontrada(f'Sala com ID {sala_id} não encontrada.')
 
+    print("DEBUG: Valor recebido para laboratorio:", novos_dados.get('laboratorio'))
+    true_values = ['true', '1', 't', 'yes', 'sim', 'True', 'TRUE', True, 1]
     for key, value in novos_dados.items():
+        if key == 'laboratorio':
+            value = value in true_values
         setattr(sala, key, value)
 
     db.session.commit()
