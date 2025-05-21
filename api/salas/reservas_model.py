@@ -6,6 +6,7 @@ class Reserva(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     sala_id = db.Column(db.Integer, db.ForeignKey('salas.id'), nullable=False)
     turma = db.Column(db.String(100), nullable=True)
+    professor = db.Column(db.String(100), nullable=True)
     data = db.Column(db.Date, nullable=False)
     hora_inicio = db.Column(db.Time, nullable=False)
     hora_termino = db.Column(db.Time, nullable=False)
@@ -15,6 +16,7 @@ class Reserva(db.Model):
             'id': self.id,
             'sala_id': self.sala_id,
             'turma': self.turma,
+            'professor': self.professor,
             'data': self.data.strftime("%Y-%m-%d"),
             'hora_inicio': self.hora_inicio.strftime("%H:%M"),
             'hora_termino': self.hora_termino.strftime("%H:%M"),

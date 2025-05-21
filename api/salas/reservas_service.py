@@ -26,6 +26,7 @@ def reservar_sala(sala_id, dados):
     reserva = Reserva(
         sala_id=sala_id,
         turma=dados.get('turma'),
+        professor=dados.get('professor'),
         data=data_reserva,
         hora_inicio=hora_inicio_reserva,
         hora_termino=hora_termino_reserva
